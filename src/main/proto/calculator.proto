@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package org.example;
+option java_package = "files_generated";
+option java_multiple_files = true;
+
+// Define the request message with two numbers
+message CalculationRequest {
+    int32 num1 = 1;
+    int32 num2 = 2;
+}
+
+// Define response messages
+message CalculationResponse {
+    int32 result = 1;
+}
+
+// Define the services
+
+// Addition Service
+service AdditionService {
+    rpc Add(CalculationRequest) returns (CalculationResponse);
+}
+
+// Multiplication Service
+service MultiplicationService {
+    rpc Multiply(CalculationRequest) returns (CalculationResponse);
+}
