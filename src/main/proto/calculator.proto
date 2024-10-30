@@ -10,19 +10,24 @@ message CalculationRequest {
     int32 num2 = 2;
 }
 
-// Define response messages
 message CalculationResponse {
     int32 result = 1;
 }
 
-// Define the services
+message LogEntry {
+    string operation = 1;
+    int32 result = 2;
+}
 
-// Addition Service
+message LogRequest {}
+
 service AdditionService {
     rpc Add(CalculationRequest) returns (CalculationResponse);
+    rpc StreamLogs(LogRequest) returns (stream LogEntry); // Streaming logs
 }
 
-// Multiplication Service
 service MultiplicationService {
     rpc Multiply(CalculationRequest) returns (CalculationResponse);
+    rpc StreamLogs(LogRequest) returns (stream LogEntry); // Streaming logs
 }
+
