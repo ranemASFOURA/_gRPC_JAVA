@@ -9,6 +9,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        // Set up channels for addition and multiplication services
         ManagedChannel additionChannel = ManagedChannelBuilder.forAddress("localhost", 50051)
                 .usePlaintext()
                 .build();
@@ -16,6 +17,7 @@ public class Main {
                 .usePlaintext()
                 .build();
 
+        // Create stubs to communicate with the addition and multiplication services
         AdditionServiceGrpc.AdditionServiceBlockingStub additionStub = AdditionServiceGrpc.newBlockingStub(additionChannel);
         MultiplicationServiceGrpc.MultiplicationServiceBlockingStub multiplicationStub = MultiplicationServiceGrpc.newBlockingStub(multiplicationChannel);
 
@@ -23,33 +25,67 @@ public class Main {
 
         while (true) {  // Start an infinite loop to keep the session active
             System.out.println("Choose an option:");
-            System.out.println("1. Perform Calculation");
-            System.out.println("2. View Logs");
-            System.out.println("3. Exit");
+            System.out.println("1. Perform Addition Only");
+            System.out.println("2. Perform Multiplication Only");
+            System.out.println("3. Perform Both Addition and Multiplication");
+            System.out.println("4. View Logs");
+            System.out.println("5. Exit");
             System.out.print("Enter your choice: ");
             int choice = scanner.nextInt();
 
-            if (choice == 1) {
+            if (choice == 1) {  // Perform addition only
                 System.out.print("Enter first number: ");
                 int num1 = scanner.nextInt();
                 System.out.print("Enter second number: ");
                 int num2 = scanner.nextInt();
 
-                // Prepare the request with user input
+                // Prepare the request
                 CalculationRequest request = CalculationRequest.newBuilder()
                         .setNum1(num1)
                         .setNum2(num2)
                         .build();
 
-                // Send the request to the addition and multiplication services
+                // Call addition service and display the result
+                CalculationResponse additionResponse = additionStub.add(request);
+                System.out.println("Addition Result: " + additionResponse.getResult());
+
+            } else if (choice == 2) {  // Perform multiplication only
+                System.out.print("Enter first number: ");
+                int num1 = scanner.nextInt();
+                System.out.print("Enter second number: ");
+                int num2 = scanner.nextInt();
+
+                // Prepare the request
+                CalculationRequest request = CalculationRequest.newBuilder()
+                        .setNum1(num1)
+                        .setNum2(num2)
+                        .build();
+
+                // Call multiplication service and display the result
+                CalculationResponse multiplicationResponse = multiplicationStub.multiply(request);
+                System.out.println("Multiplication Result: " + multiplicationResponse.getResult());
+
+            } else if (choice == 3) {  // Perform both addition and multiplication
+                System.out.print("Enter first number: ");
+                int num1 = scanner.nextInt();
+                System.out.print("Enter second number: ");
+                int num2 = scanner.nextInt();
+
+                // Prepare the request
+                CalculationRequest request = CalculationRequest.newBuilder()
+                        .setNum1(num1)
+                        .setNum2(num2)
+                        .build();
+
+                // Call both addition and multiplication services
                 CalculationResponse additionResponse = additionStub.add(request);
                 CalculationResponse multiplicationResponse = multiplicationStub.multiply(request);
 
-                // Display results
+                // Display both results
                 System.out.println("Addition Result: " + additionResponse.getResult());
                 System.out.println("Multiplication Result: " + multiplicationResponse.getResult());
 
-            } else if (choice == 2) {
+            } else if (choice == 4) {  // View logs for both services
                 System.out.println("Fetching Addition Logs:");
                 additionStub.streamLogs(files_generated.LogRequest.getDefaultInstance())
                         .forEachRemaining(log -> System.out.println("Addition Operation: " + log.getOperation() + " Result: " + log.getResult()));
@@ -58,11 +94,11 @@ public class Main {
                 multiplicationStub.streamLogs(files_generated.LogRequest.getDefaultInstance())
                         .forEachRemaining(log -> System.out.println("Multiplication Operation: " + log.getOperation() + " Result: " + log.getResult()));
 
-            } else if (choice == 3) {
+            } else if (choice == 5) {  // Exit the program
                 System.out.println("Exiting the program.");
                 break;  // Exit the loop, ending the program
             } else {
-                System.out.println("Invalid choice. Please enter 1, 2, or 3.");
+                System.out.println("Invalid choice. Please enter a number between 1 and 5.");
             }
         }
 
